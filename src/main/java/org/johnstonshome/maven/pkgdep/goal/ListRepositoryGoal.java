@@ -18,7 +18,11 @@ import org.johnstonshome.maven.pkgdep.model.VersionNumber;
  */
 public class ListRepositoryGoal extends AbstractMojo {
 	
-	private static final String PADDING = "    ";
+	private static final String PADDING = "    "; //$NON-NLS-1$
+	
+	private static final String HEADER_TEXT = Messages.getString("ListRepositoryGoal.headerText"); //$NON-NLS-1$
+	private static final String HEADER_UNDER = Messages.getString("ListRepositoryGoal.headerUnderline"); //$NON-NLS-1$
+	private static final String REPO_ROOT = Messages.getString("ListRepositoryGoal.repositoryRoot"); //$NON-NLS-1$
 	
 	/**
 	 * @parameter
@@ -27,14 +31,14 @@ public class ListRepositoryGoal extends AbstractMojo {
 
 	public void execute() throws MojoExecutionException {
 
-		getLog().info("Listing local package repository");
-		getLog().info("================================");
+		getLog().info(HEADER_TEXT);
+		getLog().info(HEADER_UNDER);
 
 		final Repository repository = new Repository();
 		repository.setLog(this.getLog());
 
 		if (this.verbose) {
-			getLog().info(String.format("Repository root: %s", repository.getRepositoryRoot()));
+			getLog().info(String.format(REPO_ROOT, repository.getRepositoryRoot()));
 		}
 		
 		final Set<String> packages = repository.getPackageNames();
