@@ -44,6 +44,13 @@ public class Repository implements LogAware {
 		this.repository.mkdirs();
 	}
 
+	/**
+	 * Return a set of strings representing all the packages registered in the
+	 * current repository.
+	 *  
+	 * @return a set of strings, these can be used in {link {@link #readPackage(String)}
+	 *         to load the details of a package from the repository. 
+	 */
 	public Set<String> getPackageNames() {
 		final Set<String> names = new HashSet<String>();
 		final File[] files = this.repository.listFiles();
@@ -55,6 +62,13 @@ public class Repository implements LogAware {
 		return names;
 	}
 	
+	/**
+	 * Read a package from the repository, this will load the details of all 
+	 * versions and their provider artifacts.
+	 * 
+	 * @param name the name of the package.
+	 * @return a {@link Package} instance.
+	 */
 	public Package readPackage(final String name) {
 		if (name == null) {
 			throw new IllegalArgumentException("Invalid package name, may not be null");
@@ -74,6 +88,12 @@ public class Repository implements LogAware {
 		return null;
 	}
 	
+	/**
+	 * Write a package to the repository, this will overwrite any configuration
+	 * for that package currently in the repository.
+	 * 
+	 * @param thePackage the package to write.
+	 */
 	public void writePackage(final Package thePackage) {
 		if (thePackage == null) {
 			throw new IllegalArgumentException("Invalid package, may not be null");
@@ -89,14 +109,25 @@ public class Repository implements LogAware {
 		}
 	}
 	
+	/**
+	 * Return the path to the current repository root directory.
+	 * 
+	 * @return the file system path, as a String.
+	 */
 	public String getRepositoryRoot() {
 		return this.repository.getPath();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public Log getLog() {
 		return this.log;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public void setLog(final Log log) {
 		this.log = log;
 	}
