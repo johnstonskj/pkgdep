@@ -10,10 +10,13 @@ import org.johnstonshome.maven.pkgdep.model.Repository;
 import org.johnstonshome.maven.pkgdep.model.VersionNumber;
 
 /**
- * 
+ * This goal will list, in a hierarchical form, the contents of the local 
+ * package repository. The repository maps package/version pairs to 
+ * one or more artifact/version pairs.
+ *   
  * @goal list-repository
  * 
- * @author simonjo
+ * @author simonjo (simon@johnstonshome.org)
  *
  */
 public class ListRepositoryGoal extends AbstractMojo {
@@ -25,10 +28,15 @@ public class ListRepositoryGoal extends AbstractMojo {
 	private static final String REPO_ROOT = Messages.getString("ListRepositoryGoal.repositoryRoot"); //$NON-NLS-1$
 	
 	/**
+	 * Used to determine whether to output verbose results.
+	 * 
 	 * @parameter
 	 */
 	private boolean verbose = false;
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public void execute() throws MojoExecutionException {
 
 		getLog().info(HEADER_TEXT);
@@ -44,10 +52,10 @@ public class ListRepositoryGoal extends AbstractMojo {
 		final Set<String> packages = repository.getPackageNames();
 		for (final String packageName : packages) {
 			getLog().info(packageName);
-			final Package thePackage = repository.getPackage(packageName);
+			final Package thePackage = repository.readPackage(packageName);
 			for (final VersionNumber version : thePackage.getVersions()) {
 				getLog().info(PADDING + version.toString());
-				for (final Artifact artifact : thePackage.getArtifacts(version)) {
+				for (final Artifact artifact : thePackage.resolve(version)) {
 					getLog().info(PADDING + PADDING + artifact.toString());
 				}
 			}

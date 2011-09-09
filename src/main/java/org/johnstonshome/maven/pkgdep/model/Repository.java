@@ -2,14 +2,21 @@ package org.johnstonshome.maven.pkgdep.model;
 
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.Writer;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
 
 import org.apache.maven.plugin.logging.Log;
 
+/**
+ * 
+ * @author simonjo (simon@johnstonshome.org)
+ *
+ */
 public class Repository implements LogAware {
 
 	public static final String REPO_ROOT = String.format(".mvn-osgi%srepository", System.getProperty("file.separator"));
@@ -17,8 +24,23 @@ public class Repository implements LogAware {
 	private File repository = null;
 	private Log  log = null;
 	
+	/**
+	 * Construct a new Repository object reading from the default location.
+	 */
 	public Repository() {
-		this.repository = new File(System.getProperty("user.home"), REPO_ROOT);
+		this(new File(System.getProperty("user.home"), REPO_ROOT));
+	}
+
+	/**
+	 * Construct a new Repository object reading from the identified location.
+	 * 
+	 * @param root location for the repository.
+	 */
+	public Repository(final File root) {
+		if (root == null) {
+			throw new IllegalArgumentException("Invalid repository root, may not be null");
+		}
+		this.repository = root;
 		this.repository.mkdirs();
 	}
 
@@ -33,7 +55,10 @@ public class Repository implements LogAware {
 		return names;
 	}
 	
-	public Package getPackage(final String name) {
+	public Package readPackage(final String name) {
+		if (name == null) {
+			throw new IllegalArgumentException("Invalid package name, may not be null");
+		}
 		final File packageFile = new File(this.repository, name);
 		if (packageFile.exists() && packageFile.isFile()) {
 			try {
@@ -49,8 +74,19 @@ public class Repository implements LogAware {
 		return null;
 	}
 	
-	public void addPackage(final Package thePackage) {
-		
+	public void writePackage(final Package thePackage) {
+		if (thePackage == null) {
+			throw new IllegalArgumentException("Invalid package, may not be null");
+		}
+		final File packageFile = new File(this.repository, thePackage.getName());
+		try {
+			final Properties fileProperties = new Properties();
+			final Writer fileWriter = new FileWriter(packageFile);
+			fileProperties.store(fileWriter, "Internal file, do not edit");
+			fileWriter.close();
+		} catch (IOException ex) {
+			getLog().error(String.format("Could not write repository file for package %s", packageFile.getPath()));
+		}
 	}
 	
 	public String getRepositoryRoot() {
