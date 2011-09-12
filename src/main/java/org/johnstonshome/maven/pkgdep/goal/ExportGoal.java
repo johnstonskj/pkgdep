@@ -20,7 +20,7 @@ import org.johnstonshome.maven.pkgdep.model.VersionNumber;
  * This goal scans certain known locations for exported packages from this
  * project.
  * 
- * @phase initialize
+ * @execute lifecycle="build" phase="initialize"
  * 
  * @goal export
  * 

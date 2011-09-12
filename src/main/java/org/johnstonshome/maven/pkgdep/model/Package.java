@@ -46,7 +46,7 @@ public class Package {
 	 * @param name the name of the package in its canonical Java form.
 	 * @param properties a property object to extract versions and artifacts from.
 	 */
-	Package(final String name, final Properties properties) {
+	public Package(final String name, final Properties properties) {
 		this(name);
 		if (properties == null) {
 			throw new IllegalArgumentException("Invalid properties, may not be null");
@@ -109,5 +109,12 @@ public class Package {
 			}
 		}
 		return results;
+	}
+	
+	public void addArtifact(final VersionNumber packageVersion, final Artifact artifact) {
+		if (!this.artifacts.containsKey(packageVersion)) {
+			this.artifacts.put(packageVersion, new HashSet<Artifact>());
+		}
+		this.artifacts.get(packageVersion).add(artifact);
 	}
 }
