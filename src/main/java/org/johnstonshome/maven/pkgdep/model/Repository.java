@@ -131,10 +131,7 @@ public class Repository implements LogAware {
 			for (final VersionNumber version : thePackage.getVersions()) {
 				walker.startPackageVersion(version);
 				for (final Artifact artifact : thePackage.resolve(version)) {
-					walker.startArtifact(artifact.getGroupId(), artifact.getGroupId());
-					walker.startArtifactVersion(artifact.getVersion());
-					walker.endArtifactVersion(artifact.getVersion());
-					walker.endArtifact(artifact.getGroupId(), artifact.getGroupId());
+					walker.artifact(artifact.getGroupId(), artifact.getGroupId(), artifact.getVersion());
 				}
 				walker.endPackageVersion(version);
 			}

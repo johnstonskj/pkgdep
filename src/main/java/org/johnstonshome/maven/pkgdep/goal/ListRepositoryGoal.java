@@ -47,20 +47,10 @@ public class ListRepositoryGoal extends AbstractMojo {
 		public void endPackageVersion(VersionNumber version) {
 		}
 
-		public void startArtifact(String groupId, String artifactId) {
+		public void artifact(String groupId, String artifactId, VersionNumber version) {
 			getLog().info(PADDING + PADDING + groupId + ":" + artifactId);			
-		}
-
-		public void endArtifact(String groupId, String artifactId) {
-		}
-
-		public void startArtifactVersion(VersionNumber version) {
 			getLog().info(PADDING + PADDING + PADDING + version.toString());			
 		}
-
-		public void endArtifactVersion(VersionNumber version) {
-		}
-		
 	}
 	
 	/**

@@ -56,28 +56,8 @@ public interface RepositoryWalker {
 	 * 
 	 * @param groupId the Maven group ID
 	 * @param artifactId the Maven artifact ID
-	 */
-	void startArtifact(final String groupId, final String artifactId);
-
-	/**
-	 * Events for the artifact are complete.
-	 * 
-	 * @param groupId the Maven group ID
-	 * @param artifactId the Maven artifact ID
-	 */
-	void endArtifact(final String groupId, final String artifactId);
-
-	/**
-	 * An artifact version has been found.
-	 * 
 	 * @param version the version of the artifact.
 	 */
-	void startArtifactVersion(final VersionNumber version);
+	void artifact(final String groupId, final String artifactId, final VersionNumber version);
 
-	/**
-	 * Events for the artifact version are complete.
-	 * 
-	 * @param version the version of the artifact.
-	 */
-	void endArtifactVersion(final VersionNumber version);
 }

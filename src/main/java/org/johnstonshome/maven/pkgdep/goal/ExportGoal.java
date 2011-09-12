@@ -77,6 +77,10 @@ public class ExportGoal extends AbstractMojo {
 		 */
 		getLog().info(String.format("Processing %s content...", ImportExportParser.PLUGIN_ARTIFACT));
 		packages.addAll(parser.parsePomExports(project, thisBundle));
+		
+		for (final Package found : packages) {
+			getLog().info(found.getName() + ":" + found.getVersions());
+		}
 	}
 	
 }
