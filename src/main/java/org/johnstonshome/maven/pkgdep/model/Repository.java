@@ -100,7 +100,7 @@ public class Repository implements LogAware {
 		}
 		final File packageFile = new File(this.repository, thePackage.getName());
 		try {
-			final Properties fileProperties = new Properties();
+			final Properties fileProperties = thePackage.toProperties();
 			final Writer fileWriter = new FileWriter(packageFile);
 			fileProperties.store(fileWriter, "Internal file, do not edit");
 			fileWriter.close();

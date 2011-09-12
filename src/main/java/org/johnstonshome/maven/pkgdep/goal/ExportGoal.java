@@ -11,6 +11,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.johnstonshome.maven.pkgdep.model.Artifact;
 import org.johnstonshome.maven.pkgdep.model.Package;
+import org.johnstonshome.maven.pkgdep.model.Repository;
 import org.johnstonshome.maven.pkgdep.model.VersionNumber;
 import org.johnstonshome.maven.pkgdep.parse.ImportExportParser;
 
@@ -78,8 +79,13 @@ public class ExportGoal extends AbstractMojo {
 		getLog().info(String.format("Processing %s content...", ImportExportParser.PLUGIN_ARTIFACT));
 		packages.addAll(parser.parsePomExports(project, thisBundle));
 		
+		final Repository repository = new Repository();
+		
 		for (final Package found : packages) {
 			getLog().info(found.getName() + ":" + found.getVersions());
+			final Package local = repository.readPackage(found.getName());
+			local.merge(found);
+			repository.writePackage(local);
 		}
 	}
 	

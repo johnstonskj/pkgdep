@@ -2,6 +2,7 @@ package org.johnstonshome.maven.pkgdep.model;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -112,9 +113,48 @@ public class Package {
 	}
 	
 	public void addArtifact(final VersionNumber packageVersion, final Artifact artifact) {
+		if (packageVersion == null) {
+			throw new IllegalArgumentException("Invalid package version, may not be null");
+		}
+		if (artifact == null) {
+			throw new IllegalArgumentException("Invalid artifact, may not be null");
+		}
 		if (!this.artifacts.containsKey(packageVersion)) {
 			this.artifacts.put(packageVersion, new HashSet<Artifact>());
 		}
 		this.artifacts.get(packageVersion).add(artifact);
+	}
+
+	public void merge(final Package other) {
+		if (other == null) {
+			throw new IllegalArgumentException("Invalid package, may not be null");
+		}
+		if (!this.name.equals(other.name)) {
+			throw new IllegalArgumentException("Invalid package name, must be same");
+		}
+		for (final VersionNumber version : other.getVersions()) {
+			if (!this.artifacts.containsKey(version)) {
+				this.artifacts.put(version, new HashSet<Artifact>());
+			}
+			for (final Artifact artifact : other.resolve(version)) {
+				this.artifacts.get(version).add(artifact);
+			}
+		}
+	}
+	
+	public Properties toProperties() {
+		final Properties properties = new Properties();
+		for (final VersionNumber version : getVersions()) {
+			final StringBuilder value = new StringBuilder();
+			final Iterator<Artifact> iterator = resolve(version).iterator();
+			while (iterator.hasNext()) {
+				value.append(iterator.next().toString());
+				if (iterator.hasNext()) {
+					value.append(", ");
+				}
+			}
+			properties.put(version.toString(), value.toString());
+		}		
+		return properties;
 	}
 }
