@@ -6,6 +6,10 @@
     <packaging>maven-plugin</packaging>
   	<name>Package Dependency Maven plugin</name>
 	<version>0.0.1-SNAPSHOT</version>
+	<url>http://code.google.com/p/pkgdep/</url>
+	<scm>
+		<connection>https://code.google.com/p/pkgdep</connection>
+	</scm>
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.maven</groupId>
