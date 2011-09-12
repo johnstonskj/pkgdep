@@ -117,6 +117,32 @@ public class Repository implements LogAware {
 	public String getRepositoryRoot() {
 		return this.repository.getPath();
 	}
+	
+	public void walkRepository(final RepositoryWalker walker) {
+		if (walker == null) {
+			throw new IllegalArgumentException("Invalid walker, may not be null");
+		}
+		walker.startRepository(getRepositoryRoot());
+
+		final Set<String> packages = getPackageNames();
+		for (final String packageName : packages) {
+			walker.startPackage(packageName);
+			final Package thePackage = readPackage(packageName);
+			for (final VersionNumber version : thePackage.getVersions()) {
+				walker.startPackageVersion(version);
+				for (final Artifact artifact : thePackage.resolve(version)) {
+					walker.startArtifact(artifact.getGroupId(), artifact.getGroupId());
+					walker.startArtifactVersion(artifact.getVersion());
+					walker.endArtifactVersion(artifact.getVersion());
+					walker.endArtifact(artifact.getGroupId(), artifact.getGroupId());
+				}
+				walker.endPackageVersion(version);
+			}
+			walker.endPackage(packageName);
+		}
+
+		walker.endRepository();
+	}
 
 	/**
 	 * {@inheritDoc}

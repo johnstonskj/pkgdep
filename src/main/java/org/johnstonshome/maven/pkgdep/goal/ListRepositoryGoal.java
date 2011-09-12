@@ -7,6 +7,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.johnstonshome.maven.pkgdep.model.Artifact;
 import org.johnstonshome.maven.pkgdep.model.Package;
 import org.johnstonshome.maven.pkgdep.model.Repository;
+import org.johnstonshome.maven.pkgdep.model.RepositoryWalker;
 import org.johnstonshome.maven.pkgdep.model.VersionNumber;
 
 /**
@@ -27,13 +28,45 @@ public class ListRepositoryGoal extends AbstractMojo {
 	private static final String HEADER_UNDER = Messages.getString("ListRepositoryGoal.headerUnderline"); //$NON-NLS-1$
 	private static final String REPO_ROOT = Messages.getString("ListRepositoryGoal.repositoryRoot"); //$NON-NLS-1$
 	
-	/**
-	 * Used to determine whether to output verbose results.
-	 * 
-	 * @parameter
-	 */
-	private boolean verbose = false;
+	class RepositoryWalkerImpl implements RepositoryWalker {
 
+		public void startRepository(String name) {
+			getLog().info(name);			
+		}
+
+		public void endRepository() {
+		}
+
+		public void startPackage(String name) {
+			getLog().info(name);			
+		}
+
+		public void endPackage(String name) {
+		}
+
+		public void startPackageVersion(VersionNumber version) {
+			getLog().info(PADDING + version.toString());			
+		}
+
+		public void endPackageVersion(VersionNumber version) {
+		}
+
+		public void startArtifact(String groupId, String artifactId) {
+			getLog().info(PADDING + PADDING + groupId + ":" + artifactId);			
+		}
+
+		public void endArtifact(String groupId, String artifactId) {
+		}
+
+		public void startArtifactVersion(VersionNumber version) {
+			getLog().info(PADDING + PADDING + PADDING + version.toString());			
+		}
+
+		public void endArtifactVersion(VersionNumber version) {
+		}
+		
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -45,20 +78,6 @@ public class ListRepositoryGoal extends AbstractMojo {
 		final Repository repository = new Repository();
 		repository.setLog(this.getLog());
 
-		if (this.verbose) {
-			getLog().info(String.format(REPO_ROOT, repository.getRepositoryRoot()));
-		}
-		
-		final Set<String> packages = repository.getPackageNames();
-		for (final String packageName : packages) {
-			getLog().info(packageName);
-			final Package thePackage = repository.readPackage(packageName);
-			for (final VersionNumber version : thePackage.getVersions()) {
-				getLog().info(PADDING + version.toString());
-				for (final Artifact artifact : thePackage.resolve(version)) {
-					getLog().info(PADDING + PADDING + artifact.toString());
-				}
-			}
-		}
+		repository.walkRepository(new RepositoryWalkerImpl());
 	}
 }
