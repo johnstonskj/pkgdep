@@ -1,11 +1,7 @@
 package org.johnstonshome.maven.pkgdep.goal;
 
-import java.util.Set;
-
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.johnstonshome.maven.pkgdep.model.Artifact;
-import org.johnstonshome.maven.pkgdep.model.Package;
 import org.johnstonshome.maven.pkgdep.model.Repository;
 import org.johnstonshome.maven.pkgdep.model.RepositoryWalker;
 import org.johnstonshome.maven.pkgdep.model.VersionNumber;
@@ -38,7 +34,7 @@ public class ListRepositoryGoal extends AbstractMojo {
 		}
 
 		public void startPackage(String name) {
-			getLog().info(name);			
+			getLog().info(String.format(REPO_ROOT, name));			
 		}
 
 		public void endPackage(String name) {
