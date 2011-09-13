@@ -27,14 +27,25 @@ public final class Artifact {
 	 * @param version the version of this artifact
 	 */
 	public Artifact(final String groupId, final String artifactId, final VersionNumber version) {
+		if (groupId == null) {
+			throw new IllegalArgumentException("Invalid group ID, may not be null");
+		}
+		if (artifactId == null) {
+			throw new IllegalArgumentException("Invalid artifact ID, may not be null");
+		}
+		if (version == null) {
+			throw new IllegalArgumentException("Invalid version, may not be null");
+		}
 		this.groupId = groupId;
 		this.artifactId = artifactId;
 		this.version = version;
-		// pre-calculate as these are used in sets and maps that use hashCode a lot.
+		/*
+		 * Pre-calculate as these are used in sets and maps that use hashCode a lot.
+		 */
 		int hash = 0;
-		hash = 31 * hash + (this.groupId == null ? 0 : this.groupId.hashCode());
-		hash = 31 * hash + (this.artifactId == null ? 0 : this.artifactId.hashCode());
-		hash = 31 * hash + (this.version == null ? 0 : this.version.hashCode());
+		hash = 31 * hash + this.groupId.hashCode();
+		hash = 31 * hash + this.artifactId.hashCode();
+		hash = 31 * hash + this.version.hashCode();
 		this.hash = hash;
 	}
 

@@ -12,7 +12,9 @@ import java.util.TreeSet;
 /**
  * This class models a Java package in the repository, each package has 0..n 
  * identified versions and each version then has 0..n artifacts identified
- * that provide that package/version. 
+ * that provide that package/version. The key methods here are those that 
+ * <i>resolve</i> a package a version(s) to zero or more implementing 
+ * artifacts.
  * 
  * @author simonjo (simon@johnstonshome.org)
  *
@@ -20,8 +22,15 @@ import java.util.TreeSet;
 public class Package {
 	
 	private static final String COLON = ":";
+	private static final String COMMA = ",";
 
+	/*
+	 * The fully-qualified name of a Java package.
+	 */
 	private final String name;
+	/*
+	 * The internal map holding implementing artifacts.
+	 */
 	private final Map<VersionNumber, Set<Artifact>> artifacts = new HashMap<VersionNumber, Set<Artifact>>();
 	
 	/**
@@ -57,11 +66,17 @@ public class Package {
 			if (!artifacts.containsKey(version)) {
 				artifacts.put(version, new HashSet<Artifact>());
 			}
-			final String[] parts = ((String)properties.get(key)).split(COLON);
-			if (parts.length != 3) {
-				throw new IllegalArgumentException();
+			/*
+			 * Read comma-separated list.
+			 */
+			final String[] contents = ((String)properties.get(key)).split(COMMA);
+			for (final String artifact : contents) {
+				final String[] parts = artifact.split(COLON);
+				if (parts.length != 3) {
+					throw new IllegalArgumentException();
+				}
+				artifacts.get(version).add(new Artifact(parts[0], parts[1], new VersionNumber(parts[2])));
 			}
-			artifacts.get(version).add(new Artifact(parts[0], parts[1], new VersionNumber(parts[2])));
 		}
 	}
 	
@@ -75,10 +90,34 @@ public class Package {
 		return this.name;
 	}
 	
+	/**
+	 * Return the set of all versions known for this package, note that by
+	 * returning this as a sorted set you can enumerate the versions in 
+	 * order from first to last.
+	 *  
+	 * @return a {@link SortedSet} instance holding all versions of this 
+	 *         package.
+	 */
 	public SortedSet<VersionNumber> getVersions() {
 		return new TreeSet<VersionNumber>(this.artifacts.keySet());
 	}
 	
+	/**
+	 * Return the latest version of this package in the repository.
+	 * 
+	 * @return the latest version of this package.
+	 */
+	public VersionNumber getLatestVersion() {
+		return new TreeSet<VersionNumber>(this.artifacts.keySet()).last();
+	}
+	
+	/**
+	 * Resolve a version number, that is return the set of all artifacts
+	 * that implement this package <b>at exactly this</b> version.
+	 * 
+	 * @param version the version to resolve
+	 * @return the set of all artifacts implementing the specified version.
+	 */
 	public Set<Artifact> resolve(final VersionNumber version) {
 		if (version == null) {
 			throw new IllegalArgumentException("Invalid version, may not be null");
@@ -86,6 +125,18 @@ public class Package {
 		return this.artifacts.get(version);
 	}
 
+	/**
+	 * Resolve all packages that implement this package with a version number
+	 * <b>greater than, or equal to</b> (depending on <code>startInclusive</code>)
+	 * the version <code>start</code>.
+	 * 
+	 * @param start the lower bound version to compare to
+	 * @param startInclusive whether or not this is an inclusive search, for example
+	 *        if this is <code>true</code> then the test is effectively <i>greater
+	 *        or equal</i>, whereas if this is <code>false</code> then the test is
+	 *        effectively <i>greater than</i> only.
+	 * @return the set of all artifacts implementing the specified version.
+	 */
 	public Set<Artifact> resolve(final VersionNumber start, final boolean startInclusive) {
 		if (start == null) {
 			throw new IllegalArgumentException("Invalid start version, may not be null");
@@ -100,6 +151,24 @@ public class Package {
 		return results;
 	}
 
+	/**
+	 * Resolve all packages that implement this package with a version number
+	 * <b>greater than, or equal to</b> (depending on <code>startInclusive</code>)
+	 * the version <code>start</code> <b>and</b> also <b>less thatm or equal to</b>
+	 * (depending on <code>endInclusive</code>) the version <code>end</code>.
+	 * 
+	 * @param start the lower bound version to compare to
+	 * @param startInclusive whether or not this is an inclusive search, for example
+	 *        if this is <code>true</code> then the test is effectively <i>greater
+	 *        than or equal</i>, whereas if this is <code>false</code> then the test is
+	 *        effectively <i>greater than</i> only.
+	 * @param end the upper bound version to compare to
+	 * @param endInclusive whether or not this is an inclusive search, for example
+	 *        if this is <code>true</code> then the test is effectively <i>less than
+	 *        or equal</i>, whereas if this is <code>false</code> then the test is
+	 *        effectively <i>less than</i> only.
+	 * @return the set of all artifacts implementing the specified version.
+	 */
 	public Set<Artifact> resolve(final VersionNumber start, final boolean startInclusive, final VersionNumber end, final boolean endInclusive) {
 		if (start == null) {
 			throw new IllegalArgumentException("Invalid start version, may not be null");
@@ -117,7 +186,13 @@ public class Package {
 		}
 		return results;
 	}
-	
+
+	/**
+	 * Add an artifact that implements a specified version of this package. 
+	 *  
+	 * @param packageVersion the version of the package
+	 * @param artifact the implementation artifact.
+	 */
 	public void addArtifact(final VersionNumber packageVersion, final Artifact artifact) {
 		if (packageVersion == null) {
 			throw new IllegalArgumentException("Invalid package version, may not be null");
@@ -131,6 +206,11 @@ public class Package {
 		this.artifacts.get(packageVersion).add(artifact);
 	}
 
+	/**
+	 * Merge another package's contents into this package.
+	 * 
+	 * @param other the package to merge from, into <code>this</code>.
+	 */
 	public void merge(final Package other) {
 		if (other == null) {
 			throw new IllegalArgumentException("Invalid package, may not be null");
@@ -147,16 +227,25 @@ public class Package {
 			}
 		}
 	}
-	
+
+	/**
+	 * Return this package instance serialized into a Java {@link Properties}
+	 * instance. This is the reverse of the constructor {@link #Package(String, Properties)}.
+	 * 
+	 * @return the content of this package serialized.
+	 */
 	public Properties toProperties() {
 		final Properties properties = new Properties();
 		for (final VersionNumber version : getVersions()) {
 			final StringBuilder value = new StringBuilder();
+			/*
+			 * Make comma-separated list
+			 */
 			final Iterator<Artifact> iterator = resolve(version).iterator();
 			while (iterator.hasNext()) {
 				value.append(iterator.next().toString());
 				if (iterator.hasNext()) {
-					value.append(", ");
+					value.append(COMMA);
 				}
 			}
 			properties.put(version.toString(), value.toString());
