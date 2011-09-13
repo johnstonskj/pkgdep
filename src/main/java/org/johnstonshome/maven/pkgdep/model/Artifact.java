@@ -1,3 +1,11 @@
+/*
+ * Licensed Materials - Property of Simon Johnston (simon@johnstonshome.org)
+ * (c) Copyright Simon Johnston 2009-2010. All rights reserved.
+ *
+ * For full license details, see the file LICENSE inncluded in the
+ * distribution of this code.
+ *
+ */
 package org.johnstonshome.maven.pkgdep.model;
 
 /**
@@ -10,102 +18,119 @@ package org.johnstonshome.maven.pkgdep.model;
  * and all fields are final.
  * 
  * @author simonjo (simon@johnstonshome.org)
- *
+ * 
  */
 public final class Artifact {
-	
-	private final String groupId;
-	private final String artifactId;
-	private final VersionNumber version;
-	private final int hash;
-	
-	/**
-	 * Construct a new artifact based on the standard Maven identifiers.
-	 * 
-	 * @param groupId the Maven group ID
-	 * @param artifactId the Maven artifact ID
-	 * @param version the version of this artifact
-	 */
-	public Artifact(final String groupId, final String artifactId, final VersionNumber version) {
-		if (groupId == null) {
-			throw new IllegalArgumentException("Invalid group ID, may not be null");
-		}
-		if (artifactId == null) {
-			throw new IllegalArgumentException("Invalid artifact ID, may not be null");
-		}
-		if (version == null) {
-			throw new IllegalArgumentException("Invalid version, may not be null");
-		}
-		this.groupId = groupId;
-		this.artifactId = artifactId;
-		this.version = version;
-		/*
-		 * Pre-calculate as these are used in sets and maps that use hashCode a lot.
-		 */
-		int hash = 0;
-		hash = 31 * hash + this.groupId.hashCode();
-		hash = 31 * hash + this.artifactId.hashCode();
-		hash = 31 * hash + this.version.hashCode();
-		this.hash = hash;
-	}
 
-	/**
-	 * The Maven group ID of this artifact.
-	 * 
-	 * @return the Maven group ID
-	 */
-	public String getGroupId() {
-		return this.groupId;
-	}
+    private final String        groupId;
+    private final String        artifactId;
+    private final VersionNumber version;
+    private final int           hash;
 
-	/**
-	 * The Maven artifact ID of this artifact.
-	 * 
-	 * @return the Maven artifact ID
-	 */
-	public String getArtifactId() {
-		return this.artifactId;
-	}
+    /**
+     * Construct a new artifact based on the standard Maven identifiers.
+     * 
+     * @param groupId
+     *            the Maven group ID
+     * @param artifactId
+     *            the Maven artifact ID
+     * @param version
+     *            the version of this artifact
+     */
+    public Artifact(final String groupId, final String artifactId,
+            final VersionNumber version) {
+        if (groupId == null) {
+            throw new IllegalArgumentException(
+                    "Invalid group ID, may not be null");
+        }
+        if (artifactId == null) {
+            throw new IllegalArgumentException(
+                    "Invalid artifact ID, may not be null");
+        }
+        if (version == null) {
+            throw new IllegalArgumentException(
+                    "Invalid version, may not be null");
+        }
+        this.groupId = groupId;
+        this.artifactId = artifactId;
+        this.version = version;
+        /*
+         * Pre-calculate as these are used in sets and maps that use hashCode a
+         * lot. The following is null-safe as both this and other are immutable
+         * and do not allow nulls in their constructors.
+         */
+        int hash = 0;
+        hash = 31 * hash + this.groupId.hashCode();
+        hash = 31 * hash + this.artifactId.hashCode();
+        hash = 31 * hash + this.version.hashCode();
+        this.hash = hash;
+    }
 
-	/**
-	 * The Maven version of this artifact.
-	 * 
-	 * @return the Maven version
-	 */
-	public VersionNumber getVersion() {
-		return this.version;
-	}
+    /**
+     * The Maven group ID of this artifact.
+     * 
+     * @return the Maven group ID
+     */
+    public String getGroupId() {
+        return this.groupId;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public int hashCode() {
-		return hash;
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if ((obj == null) || (obj.getClass() != this.getClass())) {
-			return false;
-		}
-		final Artifact other = (Artifact)obj;
-		return (this.groupId == other.groupId || (this.groupId != null && this.groupId.equals(other.groupId))) &&
-				(this.artifactId == other.artifactId || (this.artifactId != null && this.artifactId.equals(other.artifactId))) &&
-				(this.version == other.version || (this.version != null && this.version.equals(other.version)));
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString() {
-		return String.format("%s:%s:%s", this.groupId, this.artifactId, this.version);
-	}
+    /**
+     * The Maven artifact ID of this artifact.
+     * 
+     * @return the Maven artifact ID
+     */
+    public String getArtifactId() {
+        return this.artifactId;
+    }
+
+    /**
+     * The Maven version of this artifact.
+     * 
+     * @return the Maven version
+     */
+    public VersionNumber getVersion() {
+        return this.version;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return hash;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if ((obj == null) || (obj.getClass() != this.getClass())) {
+            return false;
+        }
+        final Artifact other = (Artifact) obj;
+        /*
+         * The following is null-safe as both this and other are immutable and
+         * do not allow nulls in their constructors.
+         */
+        return (this.groupId == other.groupId || this.groupId
+                .equals(other.groupId))
+                && (this.artifactId == other.artifactId || this.artifactId
+                        .equals(other.artifactId))
+                && (this.version == other.version || this.version
+                        .equals(other.version));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return String.format("%s:%s:%s", this.groupId, this.artifactId,
+                this.version);
+    }
 }
