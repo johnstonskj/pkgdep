@@ -65,6 +65,12 @@ public class Package {
 		}
 	}
 	
+	/**
+	 * Return the fully qualified name of the Java package represented
+	 * by this model object.
+	 * 
+	 * @return the Java package name.
+	 */
 	public String getName() {
 		return this.name;
 	}

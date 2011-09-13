@@ -118,6 +118,12 @@ public class Repository implements LogAware {
 		return this.repository.getPath();
 	}
 	
+	/**
+	 * Walk through the repository reporting back the contents via the 
+	 * callback methods on {@link RepositoryWalker}.
+	 * 
+	 * @param walker the walker to receive callbacks.
+	 */
 	public void walkRepository(final RepositoryWalker walker) {
 		if (walker == null) {
 			throw new IllegalArgumentException("Invalid walker, may not be null");

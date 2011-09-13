@@ -23,18 +23,21 @@ public class ListRepositoryGoal extends AbstractMojo {
 	private static final String HEADER_TEXT = Messages.getString("ListRepositoryGoal.headerText"); //$NON-NLS-1$
 	private static final String HEADER_UNDER = Messages.getString("ListRepositoryGoal.headerUnderline"); //$NON-NLS-1$
 	private static final String REPO_ROOT = Messages.getString("ListRepositoryGoal.repositoryRoot"); //$NON-NLS-1$
-	
+
+	/*
+	 * Used to walk and print out the contents of the repository.
+	 */
 	class RepositoryWalkerImpl implements RepositoryWalker {
 
 		public void startRepository(String name) {
-			getLog().info(name);			
+			getLog().info(String.format(REPO_ROOT, name));			
 		}
 
 		public void endRepository() {
 		}
 
 		public void startPackage(String name) {
-			getLog().info(String.format(REPO_ROOT, name));			
+			getLog().info(name);			
 		}
 
 		public void endPackage(String name) {

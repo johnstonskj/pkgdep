@@ -84,8 +84,12 @@ public class ExportGoal extends AbstractMojo {
 		for (final Package found : packages) {
 			getLog().info(found.getName() + ":" + found.getVersions());
 			final Package local = repository.readPackage(found.getName());
-			local.merge(found);
-			repository.writePackage(local);
+			if (local != null) {
+				local.merge(found);
+				repository.writePackage(local);
+			} else {
+				repository.writePackage(found);
+			}
 		}
 	}
 	
