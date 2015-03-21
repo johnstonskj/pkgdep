@@ -1,0 +1,1 @@
+Maven plugin to resolve dependencies by package, not artifact. The goal is to provide a build model that parallels the runtime model provided by OSGi.
